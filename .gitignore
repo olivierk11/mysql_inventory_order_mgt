@@ -1,0 +1,10 @@
+# OS / editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# MySQL Workbench backups
+*.bak
+*.mwb.bak

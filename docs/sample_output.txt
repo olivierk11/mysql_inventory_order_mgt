@@ -1,0 +1,447 @@
+==============================================================
+ SAMPLE OUTPUT - captured from a clean build on MySQL 8.0.46-0ubuntu0.24.04.4
+ Produced by running sql/01 ... sql/09 in order.
+==============================================================
+
+##############################################################
+#  07_demo_orders.sql
+##############################################################
+--------------
+CALL sp_place_order(1, '[{"product_id":1,"quantity":2},{"product_id":6,"quantity":12}]', @o)
+--------------
+
+--------------
+CALL sp_place_order(3, '[{"product_id":7,"quantity":60}]', @o)
+--------------
+
+--------------
+CALL sp_place_order(4, '[{"product_id":8,"quantity":8},{"product_id":9,"quantity":5}]', @o)
+--------------
+
+--------------
+CALL sp_place_order(5, '[{"product_id":8,"quantity":6},{"product_id":4,"quantity":25},{"product_id":3,"quantity":4}]', @o)
+--------------
+
+--------------
+CALL sp_place_order(5, '[{"product_id":2,"quantity":20}]', @o)
+--------------
+
+--------------
+CALL sp_place_order(2, '[{"product_id":1,"quantity":10}]', @o)
+--------------
+
+--------------
+CALL sp_place_order(1, '[{"product_id":5,"quantity":3}]', @o)
+--------------
+
+--------------
+SELECT od.order_id, p.product_name, od.quantity, od.unit_price,
+       od.discount_pct, od.line_total
+  FROM Order_Details od
+  JOIN Products p ON p.product_id = od.product_id
+ ORDER BY od.order_id, od.order_detail_id
+--------------
+
++----------+-------------------------+----------+------------+--------------+------------+
+| order_id | product_name            | quantity | unit_price | discount_pct | line_total |
++----------+-------------------------+----------+------------+--------------+------------+
+|        1 | Wireless Mouse          |        2 |      25.00 |         0.00 |      50.00 |
+|        1 | Notebook A5 (Pack of 5) |       12 |       7.50 |         5.00 |      85.50 |
+|        2 | Ballpoint Pens (Box 20) |       60 |       4.25 |        15.00 |     216.75 |
+|        3 | Office Chair            |        8 |     150.00 |         0.00 |    1200.00 |
+|        3 | Desk Lamp LED           |        5 |      29.99 |         0.00 |     149.95 |
+|        4 | Office Chair            |        6 |     150.00 |         0.00 |     900.00 |
+|        4 | Laptop Stand            |       25 |      35.00 |        10.00 |     787.50 |
+|        4 | Bluetooth Headphones    |        4 |      65.00 |         0.00 |     260.00 |
+|        5 | USB-C Charger           |       20 |      18.50 |        10.00 |     333.00 |
+|        6 | Wireless Mouse          |       10 |      25.00 |         5.00 |     237.50 |
+|        7 | Mechanical Keyboard     |        3 |      89.99 |         0.00 |     269.97 |
++----------+-------------------------+----------+------------+--------------+------------+
+--------------
+SELECT product_id, product_name, stock_quantity, reorder_level, is_low_stock
+  FROM Products
+--------------
+
++------------+-------------------------+----------------+---------------+--------------+
+| product_id | product_name            | stock_quantity | reorder_level | is_low_stock |
++------------+-------------------------+----------------+---------------+--------------+
+|          1 | Wireless Mouse          |            138 |            20 |            0 |
+|          2 | USB-C Charger           |             60 |            15 |            0 |
+|          3 | Bluetooth Headphones    |              8 |            10 |            1 |
+|          4 | Laptop Stand            |             15 |            10 |            0 |
+|          5 | Mechanical Keyboard     |              5 |            10 |            1 |
+|          6 | Notebook A5 (Pack of 5) |            288 |            50 |            0 |
+|          7 | Ballpoint Pens (Box 20) |            440 |           100 |            0 |
+|          8 | Office Chair            |              1 |             5 |            1 |
+|          9 | Desk Lamp LED           |             20 |             8 |            0 |
+|         10 | Water Bottle 1L         |              6 |            12 |            1 |
++------------+-------------------------+----------------+---------------+--------------+
+--------------
+SELECT * FROM vw_inventory_history
+ WHERE change_type = 'ORDER'
+ ORDER BY log_id
+--------------
+
++--------+---------------------+-------------------------+-------------+-----------------+--------------+-------------+----------+------------------+
+| log_id | change_date         | product_name            | change_type | quantity_change | stock_before | stock_after | order_id | notes            |
++--------+---------------------+-------------------------+-------------+-----------------+--------------+-------------+----------+------------------+
+|     16 | 2026-10-23 10:25:08 | Wireless Mouse          | ORDER       |              -2 |          150 |         148 |        1 | Sold in order #1 |
+|     17 | 2026-10-23 10:25:08 | Notebook A5 (Pack of 5) | ORDER       |             -12 |          300 |         288 |        1 | Sold in order #1 |
+|     18 | 2026-10-23 10:25:08 | Ballpoint Pens (Box 20) | ORDER       |             -60 |          500 |         440 |        2 | Sold in order #2 |
+|     19 | 2026-10-23 10:25:08 | Office Chair            | ORDER       |              -8 |           15 |           7 |        3 | Sold in order #3 |
+|     20 | 2026-10-23 10:25:08 | Desk Lamp LED           | ORDER       |              -5 |           25 |          20 |        3 | Sold in order #3 |
+|     21 | 2026-10-23 10:25:08 | Office Chair            | ORDER       |              -6 |            7 |           1 |        4 | Sold in order #4 |
+|     22 | 2026-10-23 10:25:08 | Laptop Stand            | ORDER       |             -25 |           40 |          15 |        4 | Sold in order #4 |
+|     23 | 2026-10-23 10:25:08 | Bluetooth Headphones    | ORDER       |              -4 |           12 |           8 |        4 | Sold in order #4 |
+|     24 | 2026-10-23 10:25:08 | USB-C Charger           | ORDER       |             -20 |           80 |          60 |        5 | Sold in order #5 |
+|     25 | 2026-10-23 10:25:08 | Wireless Mouse          | ORDER       |             -10 |          148 |         138 |        6 | Sold in order #6 |
+|     26 | 2026-10-23 10:25:08 | Mechanical Keyboard     | ORDER       |              -3 |            8 |           5 |        7 | Sold in order #7 |
++--------+---------------------+-------------------------+-------------+-----------------+--------------+-------------+----------+------------------+
+
+##############################################################
+#  08_demo_replenishment.sql
+##############################################################
+--------------
+SELECT * FROM vw_low_stock
+--------------
+
++------------+----------------------+-------------+----------------+---------------+---------------------+---------------------+--------------+----------------+
+| product_id | product_name         | category    | stock_quantity | reorder_level | units_below_reorder | suggested_order_qty | stock_status | last_restocked |
++------------+----------------------+-------------+----------------+---------------+---------------------+---------------------+--------------+----------------+
+|          3 | Bluetooth Headphones | Electronics |              8 |            10 |                   2 |                  12 | LOW          | NULL           |
+|          5 | Mechanical Keyboard  | Electronics |              5 |            10 |                   5 |                  15 | LOW          | NULL           |
+|          8 | Office Chair         | Furniture   |              1 |             5 |                   4 |                   9 | LOW          | NULL           |
+|         10 | Water Bottle 1L      | Accessories |              6 |            12 |                   6 |                  18 | LOW          | NULL           |
++------------+----------------------+-------------+----------------+---------------+---------------------+---------------------+--------------+----------------+
+--------------
+CALL sp_restock_product(10, 30, 'Supplier delivery #1001')
+--------------
+
+--------------
+CALL sp_replenish_low_stock(2)
+--------------
+
++----------------------+--------------+-------------+-------------+---------------+---------------------+
+| product_name         | stock_before | units_added | stock_after | reorder_level | change_date         |
++----------------------+--------------+-------------+-------------+---------------+---------------------+
+| Bluetooth Headphones |            8 |          12 |          20 |            10 | 2026-10-23 10:25:08 |
+| Mechanical Keyboard  |            5 |          15 |          20 |            10 | 2026-10-23 10:25:08 |
+| Office Chair         |            1 |           9 |          10 |             5 | 2026-10-23 10:25:08 |
++----------------------+--------------+-------------+-------------+---------------+---------------------+
+--------------
+SELECT * FROM vw_low_stock
+--------------
+
+--------------
+DROP TEMPORARY TABLE IF EXISTS tier_history
+--------------
+
+--------------
+CREATE TEMPORARY TABLE tier_history (
+    step        INT,
+    event       VARCHAR(60),
+    total_spent DECIMAL(12,2),
+    tier        VARCHAR(10)
+)
+--------------
+
+--------------
+INSERT INTO tier_history
+SELECT 1, 'Before any order', total_spent, tier
+  FROM vw_customer_spending WHERE customer_id = 6
+--------------
+
+--------------
+CALL sp_place_order(6, '[{"product_id":8,"quantity":7}]', @o)
+--------------
+
+--------------
+INSERT INTO tier_history
+SELECT 2, 'After order: 7 office chairs', total_spent, tier
+  FROM vw_customer_spending WHERE customer_id = 6
+--------------
+
+--------------
+CALL sp_place_order(6, '[{"product_id":3,"quantity":15},{"product_id":4,"quantity":2}]', @o)
+--------------
+
+--------------
+INSERT INTO tier_history
+SELECT 3, 'After order: 15 headphones + 2 laptop stands', total_spent, tier
+  FROM vw_customer_spending WHERE customer_id = 6
+--------------
+
+--------------
+SELECT * FROM tier_history ORDER BY step
+--------------
+
++------+----------------------------------------------+-------------+--------+
+| step | event                                        | total_spent | tier   |
++------+----------------------------------------------+-------------+--------+
+|    1 | Before any order                             |        0.00 | Bronze |
+|    2 | After order: 7 office chairs                 |     1050.00 | Silver |
+|    3 | After order: 15 headphones + 2 laptop stands |     2046.25 | Gold   |
++------+----------------------------------------------+-------------+--------+
+--------------
+SELECT * FROM vw_low_stock
+--------------
+
++------------+----------------------+-------------+----------------+---------------+---------------------+---------------------+--------------+---------------------+
+| product_id | product_name         | category    | stock_quantity | reorder_level | units_below_reorder | suggested_order_qty | stock_status | last_restocked      |
++------------+----------------------+-------------+----------------+---------------+---------------------+---------------------+--------------+---------------------+
+|          3 | Bluetooth Headphones | Electronics |              5 |            10 |                   5 |                  15 | LOW          | 2026-10-23 10:25:08 |
+|          8 | Office Chair         | Furniture   |              3 |             5 |                   2 |                   7 | LOW          | 2026-10-23 10:25:08 |
++------------+----------------------+-------------+----------------+---------------+---------------------+---------------------+--------------+---------------------+
+--------------
+CALL sp_replenish_low_stock(2)
+--------------
+
++----------------------+--------------+-------------+-------------+---------------+---------------------+
+| product_name         | stock_before | units_added | stock_after | reorder_level | change_date         |
++----------------------+--------------+-------------+-------------+---------------+---------------------+
+| Bluetooth Headphones |            5 |          15 |          20 |            10 | 2026-10-23 10:25:08 |
+| Office Chair         |            3 |           7 |          10 |             5 | 2026-10-23 10:25:08 |
++----------------------+--------------+-------------+-------------+---------------+---------------------+
+--------------
+SELECT * FROM vw_low_stock
+--------------
+
+--------------
+SELECT * FROM vw_inventory_history
+ WHERE product_name = 'Office Chair'
+ ORDER BY log_id
+--------------
+
++--------+---------------------+--------------+-------------+-----------------+--------------+-------------+----------+---------------------------------------+
+| log_id | change_date         | product_name | change_type | quantity_change | stock_before | stock_after | order_id | notes                                 |
++--------+---------------------+--------------+-------------+-----------------+--------------+-------------+----------+---------------------------------------+
+|      8 | 2026-10-23 10:25:07 | Office Chair | ADJUSTMENT  |              15 |            0 |          15 |     NULL | Opening stock                         |
+|     19 | 2026-10-23 10:25:08 | Office Chair | ORDER       |              -8 |           15 |           7 |        3 | Sold in order #3                      |
+|     21 | 2026-10-23 10:25:08 | Office Chair | ORDER       |              -6 |            7 |           1 |        4 | Sold in order #4                      |
+|     30 | 2026-10-23 10:25:08 | Office Chair | RESTOCK     |               9 |            1 |          10 |     NULL | Auto-replenish to 2.00x reorder level |
+|     31 | 2026-10-23 10:25:08 | Office Chair | ORDER       |              -7 |           10 |           3 |        8 | Sold in order #8                      |
+|     35 | 2026-10-23 10:25:08 | Office Chair | RESTOCK     |               7 |            3 |          10 |     NULL | Auto-replenish to 2.00x reorder level |
++--------+---------------------+--------------+-------------+-----------------+--------------+-------------+----------+---------------------------------------+
+
+##############################################################
+#  09_reports.sql
+##############################################################
+--------------
+SELECT * FROM vw_order_summary ORDER BY order_id
+--------------
+
++----------+-------------+--------------------+---------------+---------------------+--------------------+-------------+--------------+
+| order_id | customer_id | customer_name      | customer_tier | order_date          | different_products | total_items | total_amount |
++----------+-------------+--------------------+---------------+---------------------+--------------------+-------------+--------------+
+|        1 |           1 | Aline Uwase        | Bronze        | 2026-10-23 10:25:08 |                  2 |          14 |       135.50 |
+|        2 |           3 | Grace Ingabire     | Bronze        | 2026-10-23 10:25:08 |                  1 |          60 |       216.75 |
+|        3 |           4 | Patrick Habimana   | Silver        | 2026-10-23 10:25:08 |                  2 |          13 |      1349.95 |
+|        4 |           5 | Diane Mukamana     | Gold          | 2026-10-23 10:25:08 |                  3 |          35 |      1947.50 |
+|        5 |           5 | Diane Mukamana     | Gold          | 2026-10-23 10:25:08 |                  1 |          20 |       333.00 |
+|        6 |           2 | Eric Mugisha       | Bronze        | 2026-10-23 10:25:08 |                  1 |          10 |       237.50 |
+|        7 |           1 | Aline Uwase        | Bronze        | 2026-10-23 10:25:08 |                  1 |           3 |       269.97 |
+|        8 |           6 | Kevin Nshimiyimana | Gold          | 2026-10-23 10:25:08 |                  1 |           7 |      1050.00 |
+|        9 |           6 | Kevin Nshimiyimana | Gold          | 2026-10-23 10:25:08 |                  2 |          17 |       996.25 |
++----------+-------------+--------------------+---------------+---------------------+--------------------+-------------+--------------+
+--------------
+SELECT customer_name,
+       COUNT(*)          AS total_orders,
+       SUM(total_items)  AS total_items,
+       SUM(total_amount) AS total_spent
+  FROM vw_order_summary
+ GROUP BY customer_id, customer_name
+ ORDER BY total_spent DESC
+--------------
+
++--------------------+--------------+-------------+-------------+
+| customer_name      | total_orders | total_items | total_spent |
++--------------------+--------------+-------------+-------------+
+| Diane Mukamana     |            2 |          55 |     2280.50 |
+| Kevin Nshimiyimana |            2 |          24 |     2046.25 |
+| Patrick Habimana   |            1 |          13 |     1349.95 |
+| Aline Uwase        |            2 |          17 |      405.47 |
+| Eric Mugisha       |            1 |          10 |      237.50 |
+| Grace Ingabire     |            1 |          60 |      216.75 |
++--------------------+--------------+-------------+-------------+
+--------------
+SELECT * FROM vw_customer_spending ORDER BY total_spent DESC
+--------------
+
++-------------+--------------------+------------------------------+--------+--------------+-------------+-----------------+---------------------+
+| customer_id | customer_name      | email                        | tier   | total_orders | total_spent | avg_order_value | last_order_date     |
++-------------+--------------------+------------------------------+--------+--------------+-------------+-----------------+---------------------+
+|           5 | Diane Mukamana     | diane.mukamana@example.com   | Gold   |            2 |     2280.50 |         1140.25 | 2026-10-23 10:25:08 |
+|           6 | Kevin Nshimiyimana | kevin.n@example.com          | Gold   |            2 |     2046.25 |         1023.13 | 2026-10-23 10:25:08 |
+|           4 | Patrick Habimana   | patrick.habimana@example.com | Silver |            1 |     1349.95 |         1349.95 | 2026-10-23 10:25:08 |
+|           1 | Aline Uwase        | aline.uwase@example.com      | Bronze |            2 |      405.47 |          202.74 | 2026-10-23 10:25:08 |
+|           2 | Eric Mugisha       | eric.mugisha@example.com     | Bronze |            1 |      237.50 |          237.50 | 2026-10-23 10:25:08 |
+|           3 | Grace Ingabire     | grace.ingabire@example.com   | Bronze |            1 |      216.75 |          216.75 | 2026-10-23 10:25:08 |
++-------------+--------------------+------------------------------+--------+--------------+-------------+-----------------+---------------------+
+--------------
+SELECT tier,
+       COUNT(*)         AS customers,
+       SUM(total_spent) AS tier_revenue
+  FROM vw_customer_spending
+ GROUP BY tier
+ ORDER BY FIELD(tier, 'Gold', 'Silver', 'Bronze')
+--------------
+
++--------+-----------+--------------+
+| tier   | customers | tier_revenue |
++--------+-----------+--------------+
+| Gold   |         2 |      4326.75 |
+| Silver |         1 |      1349.95 |
+| Bronze |         3 |       859.72 |
++--------+-----------+--------------+
+--------------
+SELECT od.order_id,
+       CONCAT(c.first_name, ' ', c.last_name)       AS customer_name,
+       p.product_name,
+       od.quantity,
+       od.discount_pct,
+       od.quantity * od.unit_price                   AS price_before_discount,
+       od.line_total                                 AS price_after_discount,
+       (od.quantity * od.unit_price) - od.line_total AS customer_saved
+  FROM Order_Details od
+  JOIN Orders    o ON o.order_id    = od.order_id
+  JOIN Customers c ON c.customer_id = o.customer_id
+  JOIN Products  p ON p.product_id  = od.product_id
+ WHERE od.discount_pct > 0
+ ORDER BY customer_saved DESC
+--------------
+
++----------+--------------------+-------------------------+----------+--------------+-----------------------+----------------------+----------------+
+| order_id | customer_name      | product_name            | quantity | discount_pct | price_before_discount | price_after_discount | customer_saved |
++----------+--------------------+-------------------------+----------+--------------+-----------------------+----------------------+----------------+
+|        4 | Diane Mukamana     | Laptop Stand            |       25 |        10.00 |                875.00 |               787.50 |          87.50 |
+|        9 | Kevin Nshimiyimana | Bluetooth Headphones    |       15 |         5.00 |                975.00 |               926.25 |          48.75 |
+|        2 | Grace Ingabire     | Ballpoint Pens (Box 20) |       60 |        15.00 |                255.00 |               216.75 |          38.25 |
+|        5 | Diane Mukamana     | USB-C Charger           |       20 |        10.00 |                370.00 |               333.00 |          37.00 |
+|        6 | Eric Mugisha       | Wireless Mouse          |       10 |         5.00 |                250.00 |               237.50 |          12.50 |
+|        1 | Aline Uwase        | Notebook A5 (Pack of 5) |       12 |         5.00 |                 90.00 |                85.50 |           4.50 |
++----------+--------------------+-------------------------+----------+--------------+-----------------------+----------------------+----------------+
+--------------
+SELECT product_name, stock_quantity, reorder_level,
+       CASE
+           WHEN stock_quantity = 0                   THEN 'OUT OF STOCK'
+           WHEN stock_quantity < reorder_level       THEN 'LOW - REORDER'
+           WHEN stock_quantity < reorder_level * 1.5 THEN 'WATCH'
+           ELSE 'OK'
+       END AS stock_status
+  FROM Products
+ ORDER BY stock_quantity / reorder_level
+--------------
+
++-------------------------+----------------+---------------+--------------+
+| product_name            | stock_quantity | reorder_level | stock_status |
++-------------------------+----------------+---------------+--------------+
+| Laptop Stand            |             13 |            10 | WATCH        |
+| Bluetooth Headphones    |             20 |            10 | OK           |
+| Mechanical Keyboard     |             20 |            10 | OK           |
+| Office Chair            |             10 |             5 | OK           |
+| Desk Lamp LED           |             20 |             8 | OK           |
+| Water Bottle 1L         |             36 |            12 | OK           |
+| USB-C Charger           |             60 |            15 | OK           |
+| Ballpoint Pens (Box 20) |            440 |           100 | OK           |
+| Notebook A5 (Pack of 5) |            288 |            50 | OK           |
+| Wireless Mouse          |            138 |            20 | OK           |
++-------------------------+----------------+---------------+--------------+
+--------------
+SELECT p.product_name, p.category,
+       SUM(od.quantity)   AS units_sold,
+       SUM(od.line_total) AS revenue
+  FROM Order_Details od
+  JOIN Products p ON p.product_id = od.product_id
+ GROUP BY p.product_id, p.product_name, p.category
+ ORDER BY revenue DESC
+--------------
+
++-------------------------+-------------+------------+---------+
+| product_name            | category    | units_sold | revenue |
++-------------------------+-------------+------------+---------+
+| Office Chair            | Furniture   |         21 | 3150.00 |
+| Bluetooth Headphones    | Electronics |         19 | 1186.25 |
+| Laptop Stand            | Accessories |         27 |  857.50 |
+| USB-C Charger           | Electronics |         20 |  333.00 |
+| Wireless Mouse          | Electronics |         12 |  287.50 |
+| Mechanical Keyboard     | Electronics |          3 |  269.97 |
+| Ballpoint Pens (Box 20) | Stationery  |         60 |  216.75 |
+| Desk Lamp LED           | Furniture   |          5 |  149.95 |
+| Notebook A5 (Pack of 5) | Stationery  |         12 |   85.50 |
++-------------------------+-------------+------------+---------+
+--------------
+EXPLAIN SELECT * FROM Inventory_Logs WHERE product_id = 8 ORDER BY change_date
+--------------
+
++----+-------------+----------------+------------+------+-----------------------+-----------------------+---------+-------+------+----------+-------+
+| id | select_type | table          | partitions | type | possible_keys         | key                   | key_len | ref   | rows | filtered | Extra |
++----+-------------+----------------+------------+------+-----------------------+-----------------------+---------+-------+------+----------+-------+
+|  1 | SIMPLE      | Inventory_Logs | NULL       | ref  | idx_logs_product_date | idx_logs_product_date | 4       | const |    6 |   100.00 | NULL  |
++----+-------------+----------------+------------+------+-----------------------+-----------------------+---------+-------+------+----------+-------+
+--------------
+EXPLAIN SELECT order_id, order_date, total_amount
+          FROM Orders WHERE customer_id = 5 ORDER BY order_date DESC
+--------------
+
++----+-------------+--------+------------+------+--------------------------+--------------------------+---------+-------+------+----------+---------------------+
+| id | select_type | table  | partitions | type | possible_keys            | key                      | key_len | ref   | rows | filtered | Extra               |
++----+-------------+--------+------------+------+--------------------------+--------------------------+---------+-------+------+----------+---------------------+
+|  1 | SIMPLE      | Orders | NULL       | ref  | idx_orders_customer_date | idx_orders_customer_date | 4       | const |    2 |   100.00 | Backward index scan |
++----+-------------+--------+------------+------+--------------------------+--------------------------+---------+-------+------+----------+---------------------+
+
+##############################################################
+#  10_error_tests.sql
+##############################################################
+--------------
+CALL sp_place_order(2, '[{"product_id":4,"quantity":1},{"product_id":5,"quantity":500}]', @o)
+--------------
+
+ERROR 1644 (45000) at line 16: Insufficient stock for "Mechanical Keyboard": requested 500, available 20
+--------------
+CALL sp_place_order(999, '[{"product_id":1,"quantity":1}]', @o)
+--------------
+
+ERROR 1644 (45000) at line 19: Customer does not exist
+--------------
+CALL sp_place_order(1, '[]', @o)
+--------------
+
+ERROR 1644 (45000) at line 22: Order must contain at least one product
+--------------
+CALL sp_restock_product(1, -5, 'Bad quantity')
+--------------
+
+ERROR 1644 (45000) at line 25: Restock quantity must be greater than zero
+--------------
+CALL sp_restock_product(999, 10, 'Unknown product')
+--------------
+
+ERROR 1644 (45000) at line 28: Product does not exist
+--------------
+INSERT INTO Products (product_name, category, price) VALUES ('Bad', 'Test', -5)
+--------------
+
+ERROR 3819 (HY000) at line 31: Check constraint 'chk_price' is violated.
+--------------
+INSERT INTO Customers (first_name, last_name, email) VALUES ('X', 'Y', 'aline.uwase@example.com')
+--------------
+
+ERROR 1062 (23000) at line 34: Duplicate entry 'aline.uwase@example.com' for key 'Customers.email'
+--------------
+SELECT COUNT(*) AS total_orders FROM Orders
+--------------
+
++--------------+
+| total_orders |
++--------------+
+|            9 |
++--------------+
+--------------
+SELECT stock_quantity FROM Products WHERE product_id = 4
+--------------
+
++----------------+
+| stock_quantity |
++----------------+
+|             13 |
++----------------+
