@@ -5,7 +5,7 @@
 | **Names** | Olivier Kwizera|
 | **Course** |MYSQL FOR DATA PROFESSIONAL |
 | **Instutition** |AmaliTech |
-| **Date** | _Submission date_ |
+| **Date** |23 October 2026 |
 | **Technology** | MySQL 8.0, MySQL Workbench |
 
 ---
