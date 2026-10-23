@@ -16,4 +16,4 @@ Run `sql/00_full_build.sql` in MySQL Workbench, then save these screenshots in t
 | `10_explain.png` | `EXPLAIN` results showing the `key` column (Section 9.8) |
 | `11_error_stock.png` | Output panel with the "Insufficient stock" error from `sql/10_error_tests.sql` |
 
-**Tip (Windows):** press `Win + Shift + S` to capture part of the screen, then paste it into Paint and save it as PNG.
+
